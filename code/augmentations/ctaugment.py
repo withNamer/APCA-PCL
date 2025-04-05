@@ -48,11 +48,11 @@ class CTAugment(object):
         for k, op in OPS.items():
             self.rates[k] = tuple([np.ones(x, "f") for x in op.bins])
             
-    # Avoid to have all zero. 这不是避免了全部为0吗？难道说有什么异同？
+    # Avoid to have all zero. 
     def rate_to_p(self, rate):
         # print("rate", rate)
         p = rate + (1 - self.decay)  
-        p = p / p.max()  # 感觉这里需要改进
+        p = p / p.max()  
         p[p < self.th] = 0
         return p
 
@@ -92,7 +92,7 @@ class CTAugment(object):
             for r, bin in zip(rnd, bins):
                 p = self.rate_to_p(bin)
                 # try:
-                value = np.random.choice(p.shape[0], p=p / p.sum())  # 这个太离谱了，为什么p.sum()会等于0
+                value = np.random.choice(p.shape[0], p=p / p.sum())  
                 # except:
                 #     print("bins", bins)
                 #     print("p", p)
@@ -268,7 +268,7 @@ def translate_y(x, delta):
 #     for (op, args), index in zip(ops_strong, strong_index):
 #         if index == True:
 #             height_loc = np.random.randint(low=img_height // 2, high=img_height)
-#             width_loc = np.random.randint(low=img_height // 2, high=img_width)  # 原来是这里具有随机性
+#             width_loc = np.random.randint(low=img_height // 2, high=img_width) 
 #     #         # height_loc = 0
 #     #         # width_loc = 0 
 #     #         # height_loc_all.append(height_loc)
