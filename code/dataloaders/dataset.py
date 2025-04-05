@@ -220,7 +220,7 @@ class BaseDataSets_isic2016(Dataset):
 #         return image, label
 #     else:
 #         return image
-def random_rot_flip(image, label=None):  # 服了，这里也有问题
+def random_rot_flip(image, label=None):  
     k = np.random.randint(0, 4)
     # image = np.rot90(image, k)
     image = np.rot90(image, k, axes=(1, 2))
@@ -308,7 +308,7 @@ def grid_mask(image):
 #     for (op, args), index in zip(ops_strong, strong_index):
 #         if index == True:
 #             height_loc = np.random.randint(low=img_height // 2, high=img_height)
-#             width_loc = np.random.randint(low=img_height // 2, high=img_width)  # 原来是这里具有随机性
+#             width_loc = np.random.randint(low=img_height // 2, high=img_width)  
 #     #         # height_loc = 0
 #     #         # width_loc = 0 
 #     #         # height_loc_all.append(height_loc)
@@ -338,7 +338,7 @@ class CTATransform(object):
     def __call__(self, sample, ops_weak, ops_strong): # , ops_strong_cutout
         image, label = sample["image"], sample["label"]
         # image = image.permute(1, 2, 0).contiguous()
-        # image = self.resize_glas_image(image)  # 注意这里需要改变
+        # image = self.resize_glas_image(image)  
         # label = self.resize_glas_image(label)
         image = self.resize(image)
         label = self.resize(label)
@@ -376,7 +376,7 @@ class CTATransform(object):
         # for (op, args), index in zip(ops_strong, strong_index):
         #     if index == True:
         #         # height_loc = np.random.randint(low=img_height // 2, high=img_height)
-        #         # width_loc = np.random.randint(low=img_height // 2, high=img_width)  # 原来是这里具有随机性
+        #         # width_loc = np.random.randint(low=img_height // 2, high=img_width) 
         # #         # height_loc = 0
         # #         # width_loc = 0 
         # #         # height_loc_all.append(height_loc)
@@ -398,14 +398,14 @@ class CTATransform(object):
         # for (op, args), index in zip(ops_strong_cutout, strong_index):
         #     if index == True:
         #         height_loc = np.random.randint(low=img_height // 2, high=img_height)
-        #         width_loc = np.random.randint(low=img_height // 2, high=img_width)  # 原来是这里具有随机性
+        #         width_loc = np.random.randint(low=img_height // 2, high=img_width)  
         #         image_strong_cutout, _, _ = OPS[op].f(image_strong_cutout, height_loc, width_loc, *args)
         #     else:
         #         image_strong_cutout = OPS[op].f(image_strong_cutout, *args)
 
         label_aug = augmentations.cta_apply(transforms.ToPILImage()(label), ops_weak)
         # label_aug_strong = test_np_2(label_aug,ops_strong,strong_index,img_height,img_width)
-        # label_aug_strong = augmentations.cta_apply(transforms.ToPILImage()(label), ops_strong)  # woc，居然是这里有问题，终于明白了随机性有多么有用，这可能就是随机性不同引起的
+        # label_aug_strong = augmentations.cta_apply(transforms.ToPILImage()(label), ops_strong)  
         # height_loc = np.random.randint(low=img_height // 2, high=img_height)
         # width_loc = np.random.randint(low=img_height // 2, high=img_width)
         # print(height_loc)
@@ -721,7 +721,7 @@ class RandomGenerator_s(object):
 #         sample = {"image": image, "label": label}
 #         return sample
 
-class RandomGenerator(object):  # 都存在问题，3为channel通道
+class RandomGenerator(object):  
     def __init__(self, output_size):
         self.output_size = output_size
 
