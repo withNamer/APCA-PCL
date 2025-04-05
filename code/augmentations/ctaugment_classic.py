@@ -260,7 +260,7 @@ def translate_y(x, delta):
 #     for (op, args), index in zip(ops_strong, strong_index):
 #         if index == True:
 #             height_loc = np.random.randint(low=img_height // 2, high=img_height)
-#             width_loc = np.random.randint(low=img_height // 2, high=img_width)  # 原来是这里具有随机性
+#             width_loc = np.random.randint(low=img_height // 2, high=img_width)  
 #     #         # height_loc = 0
 #     #         # width_loc = 0 
 #     #         # height_loc_all.append(height_loc)
