@@ -15,7 +15,7 @@ from torch.utils.data.sampler import Sampler
 import torch.distributed as dist
 import networks
 
-# many issues with this function，感觉是哪里抄过来的，完全不知道干嘛
+# many issues with this function
 # def load_model(path):
 #     """Loads model and return it without DataParallel table."""
 #     if os.path.isfile(path):
@@ -48,7 +48,7 @@ import networks
 #         print("=> no checkpoint found at '{}'".format(path))
 #     return model
 
-# 并无涉及多卡训练from_ddp，应当是从其他地方抄来的；应该是需要添加关键字
+
 def load_checkpoint(path, model, optimizer, from_ddp=False):
     """loads previous checkpoint
     Args:
@@ -69,7 +69,7 @@ def load_checkpoint(path, model, optimizer, from_ddp=False):
     loss = checkpoint["loss"]
     return model, optimizer, checkpoint["epoch"], loss.item()
 
-def load_checkpoint_more(path,  model1, model1_t, optimizer1, optimizer1_t, optimizer3, projector_1, projector_3, cta,):  # 在load上需要明确具体对象
+def load_checkpoint_more(path,  model1, model1_t, optimizer1, optimizer1_t, optimizer3, projector_1, projector_3, cta,):  
     """loads previous checkpoint
     Args:
         path (str): path to checkpoint
