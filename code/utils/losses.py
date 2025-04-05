@@ -546,7 +546,7 @@ class contrastive_loss_sup(torch.nn.Module):
         l_pos = l_pos.view(-1, 1) 
         # neg logit
         if self.nce_includes_all_negatives_from_minibatch:
-            # reshape features as if they are all negatives of minibatch of size 1. 应该从ViT角度获取的通道维度
+            # reshape features as if they are all negatives of minibatch of size 1. 
             batch_dim_for_bmm = 1
         else:
             batch_dim_for_bmm = batch_size
@@ -605,7 +605,7 @@ class contrastive_loss_sup_seq(torch.nn.Module):
         l_pos = l_pos.view(-1, 1) 
         # neg logit
         if self.nce_includes_all_negatives_from_minibatch:
-            # reshape features as if they are all negatives of minibatch of size 1. 应该从ViT角度获取的通道维度
+            # reshape features as if they are all negatives of minibatch of size 1.
             batch_dim_for_bmm = 1
         else:
             batch_dim_for_bmm = batch_size
@@ -762,7 +762,7 @@ class MocoLoss_list(torch.nn.Module):
         assert feat_q.size() == feat_k.size(), (feat_q.size(), feat_k.size())
         dim = feat_q.shape[1]
         batch_size = feat_q.shape[0]
-        feat_q = feat_q.reshape(batch_size,-1)  #转成向量
+        feat_q = feat_q.reshape(batch_size,-1)  
         feat_k = feat_k.reshape(batch_size,-1)
 
         K = len(self.queue)
@@ -824,7 +824,7 @@ def semi_crc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshold=
     if not conf_mask:
         raise NotImplementedError
     mask = ~(pseudo_outputs == -1)
-    pseudo_outputs.masked_fill_(~mask, 0)  # 果然是由于这里面由-1导致了错误
+    pseudo_outputs.masked_fill_(~mask, 0) 
 
     targets_prob = F.softmax(targets, dim=1)
 
@@ -837,7 +837,7 @@ def semi_crc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshold=
     neg_weight = targets_prob.min(1)[0]
     neg_mask = (neg_weight < neg_threshold)
     neg_mask = neg_mask * mask
-    neg_weight = 1 - neg_weight  # 这个在文章里面有，但是在代码库里却没有
+    neg_weight = 1 - neg_weight 
 
     y_tilde = pseudo_outputs
     if not torch.any(pos_mask):
@@ -851,10 +851,10 @@ def semi_crc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshold=
     if not torch.any(neg_mask):
         negative_loss_mat = torch.tensor([.0], device=targets.device)
     else:
-        inverse_prob = torch.clamp(1-F.softmax(inputs, dim=1), min=1e-6, max=1.0) # 这个F.nll_loss这样写是不对的，不如手写一下cross_entropy
+        inverse_prob = torch.clamp(1-F.softmax(inputs, dim=1), min=1e-6, max=1.0)
         inverse_prob = inverse_prob.log()
         # a = 1 - label_onehot(y_tilde, 4)
-        negative_loss_mat = -torch.sum(inverse_prob * (1 - label_onehot(y_tilde, 4)), dim=1)  # 注意这里与类有关
+        negative_loss_mat = -torch.sum(inverse_prob * (1 - label_onehot(y_tilde, 4)), dim=1) 
         negative_loss_mat = negative_loss_mat * neg_weight
         negative_loss_mat = negative_loss_mat[neg_mask]
 
@@ -864,7 +864,7 @@ def semi_mycrc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshol
     if not conf_mask:
         raise NotImplementedError
     mask = ~(pseudo_outputs == -1)
-    pseudo_outputs.masked_fill_(~mask, 0)  # 果然是由于这里面由-1导致了错误
+    pseudo_outputs.masked_fill_(~mask, 0) 
 
     targets_prob = F.softmax(targets, dim=1)
 
@@ -879,7 +879,7 @@ def semi_mycrc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshol
     neg_mask = (targets_prob < neg_threshold)
     # neg_mask = neg_mask * mask.unsqueeze(1)
     neg_weight = 1 - targets_prob
-    # neg_weight = 1 - neg_weight  # 这个在文章里面有，但是在代码库里却没有
+    # neg_weight = 1 - neg_weight  
 
     # y_tilde = pseudo_outputs
     # y_tilde = torch.argmax(targets, dim=1)
@@ -895,14 +895,14 @@ def semi_mycrc_loss(inputs, pseudo_outputs, targets, threshold=0.6, neg_threshol
     if not torch.any(neg_mask):
         negative_loss_mat = torch.tensor([.0], device=targets.device)
     else:
-        inverse_prob = torch.clamp(1-F.softmax(inputs, dim=1), min=1e-6, max=1.0) # 这个F.nll_loss这样写是不对的，不如手写一下cross_entropy
+        inverse_prob = torch.clamp(1-F.softmax(inputs, dim=1), min=1e-6, max=1.0)
         inverse_prob = inverse_prob.log()
-        negative_loss_mat = inverse_prob * neg_mask  # 注意这里与类有关
+        negative_loss_mat = inverse_prob * neg_mask  
         negative_loss_mat = -torch.sum(negative_loss_mat * neg_weight, dim=1)
         negative_loss_mat = negative_loss_mat[mask]
 
     # 这里还有个类要处理，man what can i say
-    return positive_loss_mat_.mean() + positive_loss_mat.mean() + negative_loss_mat.mean() * 0.2, None # 完全可以在这里不适用Pos, positive_loss_mat_.mean() + ; 0.2
+    return positive_loss_mat_.mean() + positive_loss_mat.mean() + negative_loss_mat.mean() * 0.2, None 
 
 # peer-based binary cross-entropy
 def semi_cbc_loss(inputs, targets,
@@ -934,7 +934,7 @@ def semi_cbc_loss(inputs, targets,
         inverse_prob = torch.clamp(1-F.softmax(inputs, dim=1), min=1e-6, max=1.0)
         a = torch.nn.functional.one_hot(y_tilde, num_classes=4)
         b = ~a
-        inverse_tilde = ~torch.nn.functional.one_hot(y_tilde, num_classes=4).permute(0, 3, 1, 2)  # -1可还行，感觉这里不正确
+        inverse_tilde = ~torch.nn.functional.one_hot(y_tilde, num_classes=4).permute(0, 3, 1, 2) 
 
         negative_loss_mat = inverse_prob.log() * inverse_tilde
         negative_loss_mat = negative_loss_mat * neg_weight
