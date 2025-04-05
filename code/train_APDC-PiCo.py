@@ -364,7 +364,6 @@ def train(args, snapshot_path):
             #     # target_a = strong_batch
             #     # target_b = weak_batch[rand_index] 
 
-            #     # 考虑是否一个batch内不需要全部cutmix
             #     bbx1_l, bby1_l, bbx2_l, bby2_l = rand_bbox(weak_batch[:args.labeled_bs].shape, lam)
             #     strong_batch[:args.labeled_bs][:, :, bbx1_l:bbx2_l, bby1_l:bby2_l] = strong_batch[:args.labeled_bs][rand_index_l, :, bbx1_l:bbx2_l, bby1_l:bby2_l]
             #     weak_batch[:args.labeled_bs][:, :, bbx1_l:bbx2_l, bby1_l:bby2_l] = weak_batch[:args.labeled_bs][rand_index_l, :, bbx1_l:bbx2_l, bby1_l:bby2_l]
@@ -407,7 +406,7 @@ def train(args, snapshot_path):
 #################################################################################################################################
             # noise = torch.zeros_like(weak_batch).uniform_(-.02, .02)
             outputs_weak1,_,_,_,_ = model1(weak_batch)  # outputs_weak1_
-            outputs_weak_soft1 = torch.softmax(outputs_weak1, dim=1)  # 如果softmax加T会不会有所长进
+            outputs_weak_soft1 = torch.softmax(outputs_weak1, dim=1)  
 
             # noise = torch.zeros_like(strong_batch).uniform_(-.05, .05)
             outputs_strong1,_,_,_,_ = model1(strong_batch)
@@ -450,7 +449,7 @@ def train(args, snapshot_path):
                 pseudo_outputs_hh = (mask_hh.float() * normalize_1 + mask_hh.float() * normalize_2) / 2
 
                 mask_hm = mask_h1 & mask_m2
-                pseudo_outputs_hm = (mask_hm.float() * normalize_1 + mask_hm.float() * normalize_2 * 0.5) / 2  # 乘以0.5和除以2没什么区别
+                pseudo_outputs_hm = (mask_hm.float() * normalize_1 + mask_hm.float() * normalize_2 * 0.5) / 2  
                 mask_mh = mask_m1 & mask_h2
                 pseudo_outputs_mh = (mask_mh.float() * 0.5 * normalize_1 + mask_mh.float() * normalize_2) / 2
 
@@ -500,7 +499,7 @@ def train(args, snapshot_path):
             unsup_loss = unsup_loss1 + unsup_loss2
 ###########################################################################################################               
             # cut_strong_batch1, cut_pseudo_outputs_cutout, cut_outputs_weak2 = cut_mix(strong_batch, pseudo_outputs_cutout, outputs_weak2)
-            # cut_outputs_strong1,_,_,_,_ = model1(cut_strong_batch1)  # 这里会占显存，导致没有办法用大batch
+            # cut_outputs_strong1,_,_,_,_ = model1(cut_strong_batch1)  
 
             loss_crc1, _ = semi_mycrc_loss(inputs=outputs_strong1[args.labeled_bs:],
                                            pseudo_outputs=pseudo_outputs_cutout[args.labeled_bs:].clone().detach(),
@@ -513,7 +512,7 @@ def train(args, snapshot_path):
             # cut_outputs_strong2,_,_,_,_ = model2(cut_strong_batch2)
 
             loss_crc2, _ = semi_mycrc_loss(inputs=outputs_strong2[args.labeled_bs:],
-                                           pseudo_outputs=pseudo_outputs_cutout[args.labeled_bs:].clone().detach(),  # 不克隆就被原地修改了
+                                           pseudo_outputs=pseudo_outputs_cutout[args.labeled_bs:].clone().detach(),  
                                            targets=outputs_weak1[args.labeled_bs:],
                                            threshold=0.65,
                                            neg_threshold=0.1,
@@ -559,7 +558,7 @@ def train(args, snapshot_path):
             num_pixel = 4096
             for i in range(args.num_classes):
                 with torch.no_grad():
-                    mask_weak_l_bool = (mask_weak_hard[:,i,:,:])[:args.labeled_bs]  # 可以在一开始就分开有监督和无监督
+                    mask_weak_l_bool = (mask_weak_hard[:,i,:,:])[:args.labeled_bs]  
                     mask_weak_l_bool_all = (pseudo_outputs == i)[:args.labeled_bs]
                     mask_weak_bool_l_batch = torch.sum(mask_weak_l_bool.view(args.labeled_bs, -1), dim=1)
                     mask_weak_bool_l_batch_all = torch.sum(mask_weak_l_bool_all.view(args.labeled_bs, -1), dim=1)
@@ -709,7 +708,7 @@ def train(args, snapshot_path):
             optimizer.step()
             scheduler.step()
 
-            if iter_num <=10000:  # 居然在rate中出现了负数，不太能忍受
+            if iter_num <=10000:  
                 coefficient = 0.5
             elif 10000 <iter_num <= 20000:
                 coefficient = 0.4
@@ -859,7 +858,7 @@ if __name__ == "__main__":
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
-    random.seed(args.seed) # python标准库的随机库
+    random.seed(args.seed) 
     os.environ['PYTHONHASHSEED'] = str(0)
 
     snapshot_path = "../model/{}_{}_labeled/{}".format(args.exp, args.labeled_num, args.model)
